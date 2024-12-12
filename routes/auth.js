@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Signup
 router.post('/signup',async (req, res)=>{
-    const {rawId, X, Y } = req.body;
+    const {name, rawId, X, Y } = req.body;
 
     try {
         //Check if the user already exists
@@ -25,7 +25,7 @@ router.post('/signup',async (req, res)=>{
         const pubkeyY = Buffer.from(Y.slice(2), 'hex');
 
         // Create a User
-        const newUser = new User({rawId, pubkeyX, pubkeyY});
+        const newUser = new User({name, rawId, pubkeyX, pubkeyY});
         await newUser.save();
 
         res.status(201).json({message:'User created successfully'});
@@ -54,6 +54,7 @@ router.post('/login',async (req, res)=>{
         res.status(200).json({
             message: 'Profile details retrieved successfully',
             data: {
+                name: user.name,
                 rawId: user.rawId,
                 pubkeyX: pubkeyXHex,
                 pubkeyY: pubkeyYHex

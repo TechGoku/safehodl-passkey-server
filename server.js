@@ -2,11 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth.js');
+const cors = require('cors');
 
 require('dotenv').config()
 
 var app = express();
 
+app.use(cors({
+    origin: '*', // or use '*' to allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // specify allowed methods if needed
+}));
 
 // Middleware
 app.use(bodyParser.json());
