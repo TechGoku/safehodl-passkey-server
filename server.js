@@ -17,21 +17,70 @@ app.use(cors({
 app.use(bodyParser.json());
 
 // Connect with mongoDB
-mongoose.connect( process.env.MONGO_URI,{
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true    
-}).then(()=>{
+}).then(() => {
     console.log('connected to MongoDB')
-}).catch((err)=>{
+}).catch((err) => {
     console.log('MongoDB connection error:', err)
 });
-
 
 // Routes
 app.use('/api/auth', authRoutes);
 
-// Start the server
+// Mobile passkey server
+app.get("/.well-known/apple-app-site-association", (req, res) => {
+    res.set({
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    });
+    const appIdentifier = "FZZKKA62H4.com.adi52.abstractionkitrnpasskeysexample";
+  
+    res.json({
+      webcredentials: {
+        apps: [appIdentifier],
+      },
+      applinks: {
+        details: [
+          {
+            appIDs: [appIdentifier],
+            components: [
+              {
+                "/": "/*",
+                comment: "Matches any URL",
+              },
+            ],
+          },
+        ],
+      },
+    });
+  });
+
+  app.get("/.well-known/assetlinks.json", (req, res) => {
+    res.set({
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    });
+  
+    res.json([
+      {
+        relation: ["delegate_permission/common.handle_all_urls"],
+        target: {
+          namespace: "android_app",
+          package_name: "com.vigneshbdx.safehodl_v2",
+          sha256_cert_fingerprints: [
+            "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C",
+          ],
+        },
+      },
+    ]);
+  });
+
+// Start the server on 127.0.0.1:4000
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, function () {
-    console.log(`Server running on port ${PORT}`);
+const HOST = '127.0.0.1';
+
+app.listen(PORT, HOST, function () {
+    console.log(`Server running at http://${HOST}:${PORT}`);
 });
