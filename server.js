@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth.js');
 const cors = require('cors');
+const fs = require('fs');
 
 require('dotenv').config()
 
@@ -25,6 +26,24 @@ mongoose.connect(process.env.MONGO_URI, {
 }).catch((err) => {
     console.log('MongoDB connection error:', err)
 });
+
+const TOKENS_FILE = './tokens.json';
+
+function readTokens() {
+  const data = fs.readFileSync(TOKENS_FILE, 'utf-8');
+  return JSON.parse(data);
+}
+
+// POST /tokens — returns all tokens without needing a request body
+app.post('/api/tokens', (req, res) => {
+  try {
+    const tokens = readTokens();
+    res.json(tokens);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch tokens' });
+  }
+});
+
 
 // Routes
 app.use('/api/auth', authRoutes);
